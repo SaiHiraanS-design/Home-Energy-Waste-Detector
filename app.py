@@ -27,6 +27,14 @@ st.sidebar.header("Settings")
 tariff = st.sidebar.slider("Tariff (Rs per kWh)", 2.0, 12.0, 6.0, 0.5)
 away_start, away_end = st.sidebar.slider("Away hours (Mon-Fri)", 0, 23, (10, 15))
 k = st.sidebar.slider("Spike sensitivity (higher = stricter)", 2.0, 5.0, 3.0, 0.5)
+year_options = sorted(daily.index.year.unique())
+full_years = [y for y in year_options if y in (2007, 2008, 2009)]
+chosen_years = st.sidebar.multiselect("Years to include", year_options, default=full_years)
+if not chosen_years:
+    st.warning("Pick at least one year in the sidebar.")
+    st.stop()
+hourly = hourly[hourly.index.year.isin(chosen_years)]
+daily = daily[daily.index.year.isin(chosen_years)]
 
 # ---------- Leak 1: standby ----------
 standby_kwh_year = standby_kw * 24 * 365
@@ -62,6 +70,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 st.divider()
+# Chart 0: rupee cost by leak (changes with the tariff and the other sliders)
+st.subheader("Where the rupees go")
+costs = pd.DataFrame({
+    "Leak": ["Standby load", "Heater/AC while away", "Spike days"],
+    "Rs per year": [standby_cost, away_cost, spike_cost],
+})
+fig0 = px.bar(costs, x="Leak", y="Rs per year", text_auto=",.0f")
+fig0.update_layout(yaxis_title="Rs per year", xaxis_title="")
+st.plotly_chart(fig0, width="stretch")
 
 # Chart 1: heatmap of average use by hour and month
 st.subheader("When does the house use power?")
@@ -74,6 +91,9 @@ fig1 = px.imshow(
     labels=dict(x="Month", y="Hour of day", color="Avg kWh"),
 )
 st.plotly_chart(fig1, width="stretch")
+fig1.add_hrect(y0=away_start - 0.5, y1=away_end + 0.5,
+               line_color="white", line_width=2, fillcolor="rgba(0,0,0,0)",
+               annotation_text="Away hours (Mon-Fri)", annotation_position="top left")  
 
 # Chart 2: daily use with spike days marked
 st.subheader("Daily use, with spike days in red")
