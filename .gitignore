@@ -2,3 +2,4 @@
 __pycache__/
 data/household_power_consumption.txt
 data/minute.parquet
+.DS_Store
