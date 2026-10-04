@@ -2,7 +2,7 @@
 **Live app:** https://home-energy-waste-detector-mtbkrjnjfd8g5uyxhddkig.streamlit.app
 Finds "leaks" in a house's electricity use from real smart-meter data and puts a rupee cost on them.
 
-**Data:** UCI Individual Household Electric Power Consumption (about 2 million one-minute readings, one house, Dec 2006 to Nov 2010, with kitchen, laundry and water heater/AC sub-meters).
+**Data:** UCI household power consumption (one French house, 2006–2010). Figures are illustrative; the method is data-agnostic.
 
 ## What it detects
 | Leak | Method | Result (at Rs 6/kWh) |
